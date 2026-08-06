@@ -9,12 +9,13 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/6tail/lunar-swift.git", from: "1.0.0"),
     ],
-    targets: [
-       .target(
-           name: "Bushi",
-            dependencies: [.product(name: "LunarSwift", package: "lunar-swift")]
-       ),
-        .testTarget(
+   targets: [
+      .target(
+          name: "Bushi",
+            dependencies: [.product(name: "LunarSwift", package: "lunar-swift")],
+            resources: [.copy("data/gua_texts.json")]
+      ),
+       .testTarget(
             name: "BushiTests",
             dependencies: ["Bushi"]
         ),
