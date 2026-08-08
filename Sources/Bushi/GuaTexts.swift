@@ -25,11 +25,13 @@ public enum GuaTextsLoader {
         cache = decoded
     }
 
+    /// 按完整卦名同步读取包内文本；卦名不存在时返回 nil，无需预加载。
     public static func getGuaTexts(_ guaName: String) -> GuaTexts? {
         initCache()
         return cache?[guaName]
     }
 
+    /// 返回包内全部 64 卦文本。
     public static func getAllGuaTexts() -> [String: GuaTexts] {
         initCache()
         return cache ?? [:]

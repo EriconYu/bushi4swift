@@ -5,6 +5,7 @@
 import Foundation
 
 public enum LiuYao {
+    /// 构建完整六爻排盘；`bianPos` 使用 0=上爻、5=初爻、-1=无动爻。
     public static func buildResult(_ ctx: DivinationContext, shangGua: Int, xiaGua: Int, bianPos: Int, method: String) -> PaipanResult {
         let shang = GuaData.baGuaNumToYaos(shangGua)
         let xia = GuaData.baGuaNumToYaos(xiaGua)
@@ -74,6 +75,10 @@ public enum LiuYao {
         return shuZiQiGua(ctx, numbers: [n0, n1, n2])
     }
 
+    /// 手摇起卦。`yaos` 必须按上爻到初爻传入。
+    ///
+    /// 铜钱记录若按初爻到上爻产生，调用前执行 `Array(records.reversed())`；
+    /// 返回数组可直接从索引 0 向下渲染，不要再次反转。
     public static func shouYaoQiGua(_ ctx: DivinationContext, yaos: [Int]) -> PaipanResult {
         let shangYY = [GuaData.yaoToYinYang(yaos[2]), GuaData.yaoToYinYang(yaos[1]), GuaData.yaoToYinYang(yaos[0])]
         let xiaYY = [GuaData.yaoToYinYang(yaos[5]), GuaData.yaoToYinYang(yaos[4]), GuaData.yaoToYinYang(yaos[3])]

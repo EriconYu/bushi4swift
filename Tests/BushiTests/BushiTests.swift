@@ -74,4 +74,54 @@ final class BushiTests: XCTestCase {
         let result = LiuYao.shouYaoQiGua(ctx, yaos: yaos)
         XCTAssertEqual(result.benGua.name, "乾为天")
     }
+
+    func testStandardLiuYaoLayout() {
+        let ctx = DivinationContext(
+            ganZhi: ["丙午", "丙申", "甲寅", "乙亥"], xunKong: "子丑",
+            lunarMonth: 6, lunarDay: 26
+        )
+        let result = LiuYao.shiJianQiGua(ctx)
+
+        XCTAssertEqual(result.benGua.name, "山火贲")
+        XCTAssertEqual(result.benGua.yaos, [1, 2, 2, 3, 2, 1])
+        XCTAssertEqual(result.bianGua?.name, "山雷颐")
+        XCTAssertEqual(result.bianGua?.yaos, [1, 2, 2, 2, 2, 1])
+        XCTAssertEqual(result.liuShen ?? [], ["玄武", "白虎", "螣蛇", "勾陈", "朱雀", "青龙"])
+
+        XCTAssertEqual(result.benGuaEx?.liuQin, "官财兄财兄官")
+        XCTAssertEqual(result.benGuaEx?.ganZhi ?? [], ["寅木", "子水", "戌土", "亥水", "丑土", "卯木"])
+        XCTAssertEqual(result.benGuaEx?.shi, 6)
+        XCTAssertEqual(result.benGuaEx?.ying, 3)
+        XCTAssertEqual(result.benGuaEx?.fuCang.map { "\($0.pos):\($0.value)" } ?? [], ["4:子申金", "5:父午火"])
+
+        XCTAssertEqual(result.bianGuaEx?.liuQin, "官财兄兄官财")
+        XCTAssertEqual(result.bianGuaEx?.shi, 3)
+        XCTAssertEqual(result.bianGuaEx?.ying, 6)
+        XCTAssertEqual(result.bianGuaEx?.fuCang.map { "\($0.pos):\($0.value)" } ?? [], ["2:子巳火", "4:官酉金"])
+    }
+
+    func testManualYaoDirectionAndMultipleChanges() {
+        let ctx = DivinationContext(
+            ganZhi: ["丙午", "丙申", "甲寅", "乙亥"], xunKong: "子丑",
+            lunarMonth: 6, lunarDay: 26
+        )
+        let bottomUp = [Yao.shaoYang, Yao.shaoYin, Yao.laoYang, Yao.shaoYin, Yao.shaoYin, Yao.shaoYang]
+        let standard = LiuYao.shouYaoQiGua(ctx, yaos: Array(bottomUp.reversed()))
+        XCTAssertEqual(standard.benGua.name, "山火贲")
+        XCTAssertEqual(standard.bianGua?.name, "山雷颐")
+
+        let multiple = LiuYao.shouYaoQiGua(
+            ctx,
+            yaos: [Yao.laoYang, Yao.shaoYin, Yao.shaoYin, Yao.laoYang, Yao.shaoYin, Yao.shaoYang]
+        )
+        XCTAssertEqual(multiple.bianYao, 0)
+        XCTAssertEqual(multiple.bianGua?.yaos[0], Yao.shaoYin)
+        XCTAssertEqual(multiple.bianGua?.yaos[3], Yao.shaoYin)
+    }
+
+    func testBundledGuaTexts() {
+        XCTAssertEqual(GuaTextsLoader.getGuaTexts("乾为天")?.name, "乾为天")
+        XCTAssertNil(GuaTextsLoader.getGuaTexts("不存在"))
+        XCTAssertEqual(GuaTextsLoader.getAllGuaTexts().count, 64)
+    }
 }
