@@ -18,6 +18,7 @@ public enum MeiHua {
         return LiuYao.buildResult(ctx, shangGua: shang, xiaGua: xia, bianPos: bianPos, method: "梅花时间起卦")
     }
 
+    /// 数字起卦；第三个数字须为非负整数并按6取余决定动爻。
     public static func shuZiQiGua(_ ctx: DivinationContext, numbers: [Int]) -> PaipanResult {
         var shang = numbers[0] % 8; if shang == 0 { shang = 8 }
         var xia = numbers[1] % 8; if xia == 0 { xia = 8 }

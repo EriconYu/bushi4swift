@@ -119,13 +119,13 @@ final class BushiTests: XCTestCase {
         XCTAssertEqual(multiple.bianGua?.yaos[3], Yao.shaoYin)
     }
 
-    func testNumberDivinationUsesExplicitMovingLine() {
+    func testNumberDivinationUsesModuloSix() {
         let ctx = DivinationContext(
             ganZhi: ["丙午", "丙申", "甲寅", "乙亥"], xunKong: "子丑",
             lunarMonth: 6, lunarDay: 26
         )
-        for yaoNumber in 1...6 {
-            let expectedIndex = 6 - yaoNumber
+        let cases = [0: 0, 1: 5, 6: 0, 7: 5, 12: 0, 13: 5]
+        for (yaoNumber, expectedIndex) in cases {
             XCTAssertEqual(LiuYao.movingLineIndex(yaoNumber), expectedIndex)
 
             let liuYao = LiuYao.shuZiQiGua(ctx, numbers: [1, 1, yaoNumber])

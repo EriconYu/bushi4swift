@@ -5,7 +5,7 @@
 import Foundation
 
 public enum LiuYao {
-    /// 将传统爻位（1=初爻，6=上爻）转换为数组索引（0=上爻，5=初爻）。
+    /// 将传统爻位转换为数组索引（0=上爻，5=初爻）；0及6的倍数为上爻，其他值按6取余。
     public static func movingLineIndex(_ yaoNumber: Int) -> Int {
         let normalized = ((yaoNumber - 1) % 6 + 6) % 6 + 1
         return 6 - normalized
@@ -66,6 +66,7 @@ public enum LiuYao {
         return buildResult(ctx, shangGua: shang, xiaGua: xia, bianPos: bianPos, method: "六爻时间起卦")
     }
 
+    /// 数字起卦；第三个数字须为非负整数并按6取余决定动爻。
     public static func shuZiQiGua(_ ctx: DivinationContext, numbers: [Int]) -> PaipanResult {
         var shang = numbers[0] % 8; if shang == 0 { shang = 8 }
         var xia = numbers[1] % 8; if xia == 0 { xia = 8 }
