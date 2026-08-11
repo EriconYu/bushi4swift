@@ -5,6 +5,12 @@
 import Foundation
 
 public enum LiuYao {
+    /// 将传统爻位（1=初爻，6=上爻）转换为数组索引（0=上爻，5=初爻）。
+    public static func movingLineIndex(_ yaoNumber: Int) -> Int {
+        let normalized = ((yaoNumber - 1) % 6 + 6) % 6 + 1
+        return 6 - normalized
+    }
+
     /// 构建完整六爻排盘；`bianPos` 使用 0=上爻、5=初爻、-1=无动爻。
     public static func buildResult(_ ctx: DivinationContext, shangGua: Int, xiaGua: Int, bianPos: Int, method: String) -> PaipanResult {
         let shang = GuaData.baGuaNumToYaos(shangGua)
@@ -56,22 +62,21 @@ public enum LiuYao {
         let sumYMDH = sumYMD + hzNum
         var shang = sumYMD % 8; if shang == 0 { shang = 8 }
         var xia = sumYMDH % 8; if xia == 0 { xia = 8 }
-        var bianPos = 6 - (sumYMDH % 6); if bianPos == 6 { bianPos = 0 }
+        let bianPos = movingLineIndex(sumYMDH)
         return buildResult(ctx, shangGua: shang, xiaGua: xia, bianPos: bianPos, method: "六爻时间起卦")
     }
 
     public static func shuZiQiGua(_ ctx: DivinationContext, numbers: [Int]) -> PaipanResult {
         var shang = numbers[0] % 8; if shang == 0 { shang = 8 }
         var xia = numbers[1] % 8; if xia == 0 { xia = 8 }
-        var bianPos = 6 - ((numbers[0]+numbers[1]+numbers[2]) % 6); if bianPos == 6 { bianPos = 0 }
+        let bianPos = movingLineIndex(numbers[2])
         return buildResult(ctx, shangGua: shang, xiaGua: xia, bianPos: bianPos, method: "六爻数字起卦")
     }
 
     public static func suiJiQiGua(_ ctx: DivinationContext) -> PaipanResult {
-        let now = Int64(Date().timeIntervalSince1970 * 1000)
-        let n0 = Int((now/1000)%9) + 1
-        let n1 = Int((now/10000)%9) + 1
-        let n2 = Int((now/100000)%9) + 1
+        let n0 = Int.random(in: 1...8)
+        let n1 = Int.random(in: 1...8)
+        let n2 = Int.random(in: 1...6)
         return shuZiQiGua(ctx, numbers: [n0, n1, n2])
     }
 

@@ -119,6 +119,39 @@ final class BushiTests: XCTestCase {
         XCTAssertEqual(multiple.bianGua?.yaos[3], Yao.shaoYin)
     }
 
+    func testNumberDivinationUsesExplicitMovingLine() {
+        let ctx = DivinationContext(
+            ganZhi: ["丙午", "丙申", "甲寅", "乙亥"], xunKong: "子丑",
+            lunarMonth: 6, lunarDay: 26
+        )
+        for yaoNumber in 1...6 {
+            let expectedIndex = 6 - yaoNumber
+            XCTAssertEqual(LiuYao.movingLineIndex(yaoNumber), expectedIndex)
+
+            let liuYao = LiuYao.shuZiQiGua(ctx, numbers: [1, 1, yaoNumber])
+            XCTAssertEqual(liuYao.bianYao, expectedIndex)
+            XCTAssertEqual(liuYao.benGua.yaos.enumerated().filter { $0.element >= 3 }.map(\.offset), [expectedIndex])
+
+            let meiHua = MeiHua.shuZiQiGua(ctx, numbers: [1, 1, yaoNumber])
+            XCTAssertEqual(meiHua.bianYao, expectedIndex)
+        }
+        XCTAssertEqual(LiuYao.shuZiQiGua(ctx, numbers: [1, 1, 1]).bianGua?.name, "天风姤")
+    }
+
+    func testRandomAndManualMovingLineInvariants() {
+        let ctx = DivinationContext(
+            ganZhi: ["丙午", "丙申", "甲寅", "乙亥"], xunKong: "子丑",
+            lunarMonth: 6, lunarDay: 26
+        )
+        for _ in 0..<20 {
+            let result = LiuYao.suiJiQiGua(ctx)
+            XCTAssertTrue((0..<6).contains(result.bianYao))
+            XCTAssertEqual(result.benGua.yaos.filter { $0 == Yao.laoYang || $0 == Yao.laoYin }.count, 1)
+        }
+        let staticResult = MeiHua.shouYaoQiGua(ctx, yaos: Array(repeating: Yao.shaoYang, count: 6))
+        XCTAssertEqual(staticResult.bianYao, -1)
+    }
+
     func testBundledGuaTexts() {
         XCTAssertEqual(GuaTextsLoader.getGuaTexts("乾为天")?.name, "乾为天")
         XCTAssertNil(GuaTextsLoader.getGuaTexts("不存在"))
