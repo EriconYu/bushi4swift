@@ -148,6 +148,10 @@ final class BushiTests: XCTestCase {
             XCTAssertTrue((0..<6).contains(result.bianYao))
             XCTAssertEqual(result.benGua.yaos.filter { $0 == Yao.laoYang || $0 == Yao.laoYin }.count, 1)
         }
+        let staticLiuYao = LiuYao.shouYaoQiGua(ctx, yaos: Array(repeating: Yao.shaoYang, count: 6))
+        XCTAssertEqual(staticLiuYao.bianYao, -1)
+        XCTAssertNil(staticLiuYao.bianGua)
+        XCTAssertNil(staticLiuYao.bianGuaEx)
         let staticResult = MeiHua.shouYaoQiGua(ctx, yaos: Array(repeating: Yao.shaoYang, count: 6))
         XCTAssertEqual(staticResult.bianYao, -1)
     }

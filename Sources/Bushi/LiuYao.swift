@@ -97,29 +97,32 @@ public enum LiuYao {
         let huYaos = GuaCalc.getHuGuaYaos(yaos)
         let huGua = GuaInfo(name: GuaCalc.get64GuaNameByYaos(huYaos), yaos: huYaos)
 
-        let bianYaos = GuaCalc.getBianGuaYaos(yaos, pos: -1)
-        let bianGua = GuaInfo(name: GuaCalc.get64GuaNameByYaos(bianYaos), yaos: bianYaos)
+        var bianPos = -1
+        for i in 0..<yaos.count {
+            if yaos[i] == Yao.laoYang || yaos[i] == Yao.laoYin { bianPos = i; break }
+        }
 
         let benGuaEx = GuaExDataMap.getGuaEx(benGuaName)
-        let bianGuaExRaw = GuaExDataMap.getGuaEx(bianGua.name)
+        var bianGua: GuaInfo? = nil
         var finalBianEx: GuaExData? = nil
-        if let bgEx = benGuaEx, let bgExRaw = bianGuaExRaw {
-            let blq = GuaExDataMap.reloadLiuQin(bgEx.wuXing, bgExRaw.ganZhi)
-            finalBianEx = GuaExData(name: bgExRaw.name, liuQin: blq.joined(),
-                ganZhi: bgExRaw.ganZhi, shi: bgExRaw.shi, ying: bgExRaw.ying,
-                fuCang: bgExRaw.fuCang, guaShen: bgExRaw.guaShen,
-                baGong: bgExRaw.baGong, wuXing: bgExRaw.wuXing, kind: bgExRaw.kind)
+        if bianPos >= 0 {
+            let bianYaos = GuaCalc.getBianGuaYaos(yaos, pos: -1)
+            let changedGua = GuaInfo(name: GuaCalc.get64GuaNameByYaos(bianYaos), yaos: bianYaos)
+            bianGua = changedGua
+            let bianGuaExRaw = GuaExDataMap.getGuaEx(changedGua.name)
+            if let bgEx = benGuaEx, let bgExRaw = bianGuaExRaw {
+                let blq = GuaExDataMap.reloadLiuQin(bgEx.wuXing, bgExRaw.ganZhi)
+                finalBianEx = GuaExData(name: bgExRaw.name, liuQin: blq.joined(),
+                    ganZhi: bgExRaw.ganZhi, shi: bgExRaw.shi, ying: bgExRaw.ying,
+                    fuCang: bgExRaw.fuCang, guaShen: bgExRaw.guaShen,
+                    baGong: bgExRaw.baGong, wuXing: bgExRaw.wuXing, kind: bgExRaw.kind)
+            }
         }
 
         var liuShen: [String]? = nil
         if ctx.ganZhi[2].count >= 1 {
             let dayGan = String(ctx.ganZhi[2].prefix(1))
             liuShen = GuaExDataMap.getLiuShen(dayGan)
-        }
-
-        var bianPos = -1
-        for i in 0..<yaos.count {
-            if yaos[i] == Yao.laoYang || yaos[i] == Yao.laoYin { bianPos = i; break }
         }
 
         return PaipanResult(method: "六爻手动起卦", ganZhi: ctx.ganZhi, xunKong: ctx.xunKong,
